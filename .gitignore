@@ -1,0 +1,35 @@
+# Datenformate
+*.xlsx
+*.xls
+*.csv
+*.ssa
+
+# Compilierte Einheiten
+*.dcu
+*.ppu
+*.o
+*.compiled
+
+# Temporäre Dateien / Backups
+*.~pas
+*.~dfm
+*.bak
+*.tmp
+*.cfg
+
+*.log
+
+
+# Lazarus generiert auch manchmal:
+lib/
+backup/
+test/
+test_cenadco_export/
+exporte/
+zeoslib/zeosdbo/
+release/
+*.or
+
+# IDE-spezifisch (optional)
+*.lps    # Lazarus Session-Dateien
+# *.lpi    # Projekt-Informationen (nur ignorieren, wenn nicht geteilt)
