@@ -21,13 +21,11 @@
 
 
 # Lazarus generiert auch manchmal:
-lib/
 backup/
 test/
 test_cenadco_export/
 exporte/
 zeoslib/zeosdbo/
-release/
 *.or
 
 # IDE-spezifisch (optional)
