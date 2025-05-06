@@ -353,7 +353,7 @@ object MainForm: TMainForm
     Height = 25
     Top = 2
     Width = 88
-    Caption = 'more Tools'
+    Caption = 'SQL-Tools'
     OnClick = b_toolsClick
     OnMouseDown = b_toolsMouseDown
     TabOrder = 13
