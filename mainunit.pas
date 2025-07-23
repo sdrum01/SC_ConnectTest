@@ -230,7 +230,7 @@ begin
   finally
 
   end;
-
+  {
   // Parameter
   for i := 1 to ParamCount do
   begin
@@ -238,8 +238,11 @@ begin
       begin
         isEnableTools := true;
       end;
-    //Writeln('Parameter ', i, ': ', ParamStr(i));
   end;
+  }
+  // Parameter überschreiben
+  isEnableTools := true;
+
   if isEnableTools then b_tools.Visible:=true;
   log_common('App gestartet, Tools: '+boolToStr(isEnableTools));
 
@@ -371,7 +374,7 @@ end;
 
 procedure TMainForm.SC_resetDefaultUser;
 var
-  _name, _vorname1, _vorname2, _password : string;
+  _name, _vorname1, _vorname2, _password1, _password2, bedienerid : string;
   Confirmation: TModalResult;
   sql:string;
   Query1: TZQuery;
@@ -379,7 +382,8 @@ begin
   _name := 'EI@BFHDJLNBI@JCBOOAJLIE@BOK@EMNE';
   _vorname1 := 'OFJFFOCJLLFJGFNH';
   _vorname2 := 'GDIINBJBEFKDEJLC';
-  _password := 'DMNDHHOHM@@@OLKA';
+  _password1 := 'DMNDHHOHM@@@OLKA';
+  _password2 := _password1;
 
   Confirmation := MessageDlg('Reset user 0001 and 0002 ?', mtConfirmation, [mbYes, mbNo], 0);
 
@@ -387,6 +391,29 @@ begin
   begin
     Query1 := TZQuery.Create(nil);
     Query1.Connection := ZConnection1;
+
+    // Code 1 holen
+    sql := 'SELECT * FROM CODEHIST WHERE BEDIENERID = :BEDIENERID';
+    Query1.SQL.Text:= sql;
+    Query1.ParamByName('BEDIENERID').AsString := '10000001';
+    Query1.Open;
+    if(Query1.RecordCount > 0)then
+    begin
+      _password1 := Query1.Fields.FieldByName('CODE').AsString;
+
+      log_common('CODE1'+ _password1);
+    end;
+    // Code 1 holen
+    sql := 'SELECT * FROM CODEHIST WHERE BEDIENERID = :BEDIENERID';
+    Query1.SQL.Text:= sql;
+    Query1.ParamByName('BEDIENERID').AsString := '10000002';
+    Query1.Open;
+    if(Query1.RecordCount > 0)then
+    begin
+      _password2 := Query1.Fields.FieldByName('CODE').AsString;
+
+      log_common('CODE2'+ _password2);
+    end;
 
     sql := 'SELECT * FROM BDATEN WHERE id = :id';
     Query1.SQL.Text:= sql;
@@ -400,17 +427,18 @@ begin
       Query1.ParamByName('name').AsString := _name;
       Query1.ParamByName('vorname').AsString  := _vorname1;
       Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
-      Query1.ParamByName('bedienercode').AsString  := _password;
+      Query1.ParamByName('bedienercode').AsString  := _password1;
       Query1.ExecSQL;
 
     end else
     begin
-      sql := 'UPDATE BDATEN SET NAME = :name, VORNAME = :vorname, KURZBEZEICHNUNG = :kurzbezeichnung, BEDIENERCODE = :bedienercode WHERE ID = 10000001';
+      //sql := 'UPDATE BDATEN SET NAME = :name, VORNAME = :vorname, KURZBEZEICHNUNG = :kurzbezeichnung, BEDIENERCODE = :bedienercode WHERE ID = 10000001';
+      sql := 'UPDATE BDATEN SET BEDIENERCODE = :bedienercode WHERE ID = 10000001';
       Query1.SQL.Text:= sql;
-      Query1.ParamByName('name').AsString := _name;
-      Query1.ParamByName('vorname').AsString  := _vorname1;
-      Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
-      Query1.ParamByName('bedienercode').AsString  := _password;
+      //Query1.ParamByName('name').AsString := _name;
+      //Query1.ParamByName('vorname').AsString  := _vorname1;
+      //Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
+      Query1.ParamByName('bedienercode').AsString  := _password1;
       Query1.ExecSQL;
 
     end;
@@ -421,22 +449,23 @@ begin
     Query1.Open;
     if(Query1.RecordCount = 0)then
     begin
-      sql := 'INSERT INTO BDATEN (NAME, VORNAME, KURZBEZEICHNUNG, BEDIENERCODE)VALUES(:name, :vorname, :kurzbezeichnung, :bedienercode)';
+      sql := 'UPDATE BDATEN SET BEDIENERCODE = :bedienercode WHERE ID = 10000002';
       Query1.SQL.Text:= sql;
-      Query1.ParamByName('name').AsString := _name;
-      Query1.ParamByName('vorname').AsString  := _vorname2;
-      Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
-      Query1.ParamByName('bedienercode').AsString  := _password;
+      //Query1.ParamByName('name').AsString := _name;
+      //Query1.ParamByName('vorname').AsString  := _vorname2;
+      //Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
+      Query1.ParamByName('bedienercode').AsString  := _password2;
       Query1.ExecSQL;
 
     end else
     begin
+      //sql := 'UPDATE BDATEN SET NAME = :name, VORNAME = :vorname, KURZBEZEICHNUNG = :kurzbezeichnung, BEDIENERCODE = :bedienercode WHERE ID = 10000002';
       sql := 'UPDATE BDATEN SET NAME = :name, VORNAME = :vorname, KURZBEZEICHNUNG = :kurzbezeichnung, BEDIENERCODE = :bedienercode WHERE ID = 10000002';
       Query1.SQL.Text:= sql;
       Query1.ParamByName('name').AsString := _name;
       Query1.ParamByName('vorname').AsString  := _vorname2;
       Query1.ParamByName('kurzbezeichnung').AsString  := 'ABC';
-      Query1.ParamByName('bedienercode').AsString  := _password;
+      Query1.ParamByName('bedienercode').AsString  := _password2;
       Query1.ExecSQL;
 
     end;
@@ -594,7 +623,7 @@ begin
     if (groessenid_new < 0) then
     begin
       s_groessenid_new := IntToStr(-groessenid_new);
-      s := 'UPDATE OR INSERT INTO GROESSEN (ID, HOEHE, BREITE, BEZEICHNUNG, ANLAGENNUMMER, GESCHAEFTSTELLE, VOLUMEINDEX) VALUES ('+s_groessenid_new+', '+groessenhoehe_tempDb+', '+groessenbreite_tempDb+', '''+groessenbezeichnung_tempDb+''', '+new_anlagennummer+', 1, 0) MATCHING (ID);';
+      s := 'UPDATE OR INSERT INTO GROESSEN (ID, HOEHE, BREITE, BEZEICHNUNG, ANLAGENNUMMER, GESCHAEFTSTELLE, VOLUMEINDEX) VALUES ('+s_groessenid_new+', '+groessenhoehe_tempDb+', '+groessenbreite_tempDb+', '''+groessenbezeichnung_tempDb+''', '+new_anlagennummer+', 1, 0) MATCHING (ID, ANLAGENNUMMER);';
       FormTools.SynEdit_export.Lines.Add(s);
       new_groesse_inserted := true;
     end;
@@ -625,34 +654,51 @@ begin
       if ZQuery1.Fields.FieldByName('ANLAGENNUMMER').AsString = FormTools.e_anlagennummeralt.Text then
       begin
         //values := new_anlagennummer + ',';
-        s := 'UPDATE OR INSERT INTO FACH (ANLAGENNUMMER, GESCHAEFTSTELLE, FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE, FACHART, SPERRE, RESERVIERUNG, ATTRAPPE, BELEGT, SELBSTANMIETUNG, UEBERWACHUNG, RUNDUM, POSTSPERRE, VERSICHID, ABRECHNUNGSART, WAEHRUNG, BERECHNUNGSZEIT, ANZAHLOEFF, T1ZEIT, T2ZEIT, T3ZEIT, LAGE, BLOCK, PREISGRUPPEINDEX) VALUES ';
-        s +='('+new_anlagennummer+', ';                          //ANLAGENNUMMER
-        s += ZQuery1.Fields.FieldByName('GESCHAEFTSTELLE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('FACHNUMMER').AsString+', ';
-        s += IntToStr(Abs(StrToIntDef(FormTools.sg_groessen.Cells[1,ZQuery1.Fields.FieldByName('GROESSENID').AsInteger],0))) +', ';
-        s += ZQuery1.Fields.FieldByName('ANZEIGHOEHE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ANZEIGBREITE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('FACHART').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('SPERRE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('RESERVIERUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BELEGT').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('SELBSTANMIETUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('UEBERWACHUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('RUNDUM').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('POSTSPERRE').AsString+', ';
-        s += FormTools.e_versichId.Text+', ';
-        if ZQuery1.Fields.FieldByName('ABRECHNUNGSART').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('ABRECHNUNGSART').AsString+', ';
-        if ZQuery1.Fields.FieldByName('WAEHRUNG').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('WAEHRUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BERECHNUNGSZEIT').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ANZAHLOEFF').AsString+', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T1ZEIT').AsDateTime)+ ''', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T2ZEIT').AsDateTime)+ ''', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T3ZEIT').AsDateTime)+ ''', ';
-        s += ZQuery1.Fields.FieldByName('LAGE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';
-        if ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').IsNull then s += 'NULL' else s += ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').AsString;
-        s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
+        if(FormTools.ckb_onlyBlock.Checked) then
+        begin
+          s := 'UPDATE OR INSERT INTO FACH (ANLAGENNUMMER, GESCHAEFTSTELLE, FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE, FACHART, ATTRAPPE, LAGE, BLOCK) VALUES ';
+          s +='('+new_anlagennummer+', ';                          //ANLAGENNUMMER
+          s += ZQuery1.Fields.FieldByName('GESCHAEFTSTELLE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('FACHNUMMER').AsString+', ';
+          s += IntToStr(Abs(StrToIntDef(FormTools.sg_groessen.Cells[1,ZQuery1.Fields.FieldByName('GROESSENID').AsInteger],0))) +', ';
+          s += ZQuery1.Fields.FieldByName('ANZEIGHOEHE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('ANZEIGBREITE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('FACHART').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('LAGE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('BLOCK').AsString;
+          s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
+        end else
+        begin
+          s := 'UPDATE OR INSERT INTO FACH (ANLAGENNUMMER, GESCHAEFTSTELLE, FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE, FACHART, SPERRE, RESERVIERUNG, ATTRAPPE, BELEGT, SELBSTANMIETUNG, UEBERWACHUNG, RUNDUM, POSTSPERRE, VERSICHID, ABRECHNUNGSART, WAEHRUNG, BERECHNUNGSZEIT, ANZAHLOEFF, T1ZEIT, T2ZEIT, T3ZEIT, LAGE, BLOCK, PREISGRUPPEINDEX) VALUES ';
+          s +='('+new_anlagennummer+', ';                          //ANLAGENNUMMER
+          s += ZQuery1.Fields.FieldByName('GESCHAEFTSTELLE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('FACHNUMMER').AsString+', ';
+          s += IntToStr(Abs(StrToIntDef(FormTools.sg_groessen.Cells[1,ZQuery1.Fields.FieldByName('GROESSENID').AsInteger],0))) +', ';
+          s += ZQuery1.Fields.FieldByName('ANZEIGHOEHE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('ANZEIGBREITE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('FACHART').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('SPERRE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('RESERVIERUNG').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('BELEGT').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('SELBSTANMIETUNG').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('UEBERWACHUNG').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('RUNDUM').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('POSTSPERRE').AsString+', ';
+          s += FormTools.e_versichId.Text+', ';
+          if ZQuery1.Fields.FieldByName('ABRECHNUNGSART').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('ABRECHNUNGSART').AsString+', ';
+          if ZQuery1.Fields.FieldByName('WAEHRUNG').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('WAEHRUNG').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('BERECHNUNGSZEIT').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('ANZAHLOEFF').AsString+', ';
+          s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T1ZEIT').AsDateTime)+ ''', ';
+          s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T2ZEIT').AsDateTime)+ ''', ';
+          s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T3ZEIT').AsDateTime)+ ''', ';
+          s += ZQuery1.Fields.FieldByName('LAGE').AsString+', ';
+          s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';
+          if ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').IsNull then s += 'NULL' else s += ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').AsString;
+          s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
+        end;
         //FormTools.Memo_export.lines.Add(s);
         FormTools.SynEdit_export.Lines.Add(s);
       end;
@@ -847,12 +893,6 @@ begin
 
   /////////////////////////////////////////////////////
   ///// GROESSEN-Tabelle ////////////////
-  // BEISPIEL
-  // UPDATE OR INSERT INTO GROESSEN (ID, HOEHE, BREITE, BEZEICHNUNG, ANLAGENNUMMER, GESCHAEFTSTELLE, VOLUMEINDEX) VALUES (11, 175, 300, '175x300x400', 1, 1, 0) MATCHING (ID);
-  // SET GENERATOR GROESSEN_ID_GEN TO 11;
-  // newGroessenListe := groessenListe;
-
-
 
   for groessenRow := 1 to FormTools.sg_groessen.RowCount - 1 do
   begin
@@ -867,7 +907,7 @@ begin
       s_groessenid_new := IntToStr(-groessenid_new);
       s_boxdepth := get_boxDepth(groessenbezeichnung_tempDb); // ToDo: die Bezeichnung auseinandernehmen und das Letzte vor dem X zurückgeben.
       //s := 'UPDATE OR INSERT INTO GROESSEN (ID, HOEHE, BREITE, BEZEICHNUNG, ANLAGENNUMMER, GESCHAEFTSTELLE, VOLUMEINDEX) VALUES ('+s_groessenid_new+', '+groessenhoehe_tempDb+', '+groessenbreite_tempDb+', '''+groessenbezeichnung_tempDb+''', 1, 1, 0) MATCHING (ID);';
-      s := 'UPDATE OR INSERT INTO CEN_SDL_BOXSIZES (ID, BOXTYPE, HEIGHT, WIDTH, BOXDEPTH, SIZENAME, ANLAGENNUMMER, VOLUMEID, VIEWHEIGHT, VIEWWIDTH) VALUES ('+s_groessenid_new+',1, '+groessenhoehe_tempDb+', '+groessenbreite_tempDb+','+s_boxdepth+', '''+groessenbezeichnung_tempDb+''', '+new_anlagennummer+', 0,'+groessenhoehe_tempDb+', '+groessenbreite_tempDb+') MATCHING (ID);';
+      s := 'UPDATE OR INSERT INTO CEN_SDL_BOXSIZES (ID, BOXTYPE, HEIGHT, WIDTH, BOXDEPTH, SIZENAME, ANLAGENNUMMER, VOLUMEID, VIEWHEIGHT, VIEWWIDTH) VALUES ('+s_groessenid_new+',1, '+groessenhoehe_tempDb+', '+groessenbreite_tempDb+','+s_boxdepth+', '''+groessenbezeichnung_tempDb+''', '+new_anlagennummer+', 0,'+groessenhoehe_tempDb+', '+groessenbreite_tempDb+') MATCHING (ID, ANLAGENNUMMER);';
 
       FormTools.SynEdit_export.Lines.Add(s);
       new_groesse_inserted := true;
@@ -885,7 +925,7 @@ begin
   ///// FACH-Tabelle ///////////
 
 
-  sql := 'SELECT ANLAGENNUMMER, GESCHAEFTSTELLE,  FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE,FACHART,SPERRE,RESERVIERUNG,ATTRAPPE,BELEGT,SELBSTANMIETUNG,UEBERWACHUNG,RUNDUM,POSTSPERRE,VERSICHID,ABRECHNUNGSART,WAEHRUNG,BERECHNUNGSZEIT,ANZAHLOEFF,T1ZEIT,T2ZEIT,T3ZEIT,LAGE,BLOCK,PREISGRUPPEINDEX from FACH where fachnummer >= ' + FormTools.e_fromBox.Text + ' AND fachnummer <= '+ FormTools.e_toBox.Text +' AND  ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by fachnummer';
+  sql := 'SELECT ANLAGENNUMMER, GESCHAEFTSTELLE,  FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE,FACHART,SPERRE,RESERVIERUNG,ATTRAPPE,BELEGT,SELBSTANMIETUNG,UEBERWACHUNG,RUNDUM,POSTSPERRE,VERSICHID,ABRECHNUNGSART,WAEHRUNG,BERECHNUNGSZEIT,ANZAHLOEFF,T1ZEIT,T2ZEIT,T3ZEIT,LAGE,BLOCK,PREISGRUPPEINDEX from FACH where fachnummer >= ' + FormTools.e_fromBox.Text + ' AND fachnummer <= '+ FormTools.e_toBox.Text +' AND  ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by ID';
   ZQuery1.SQL.Text:= sql;
   //log_common(sql);
   try
@@ -997,9 +1037,9 @@ begin
         s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';          // DUMMY oder Attrappe
         s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';             // RACKNO
         s += '1, ';                                                         // COMPANYNO
-        s += orderInBlock;                                             // orderInBlock
-        // s += orderInBlock+', ';                                             // orderInBlock
-        // s += '0';                                                           // RENTALSTATE
+        s += orderInBlock;                                                  // orderInBlock
+        // s += orderInBlock+', ';                                          // orderInBlock
+        // s += '0';                                                        // RENTALSTATE
         s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
 
         FormTools.SynEdit_export.Lines.Add(s);

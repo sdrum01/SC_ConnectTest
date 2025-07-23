@@ -53,6 +53,7 @@ type
     b_sc_add: TButton;
     b_sc_del: TButton;
     Cb_matchBreite: TCheckBox;
+    ckb_onlyBlock: TCheckBox;
     DCP_3des1: TDCP_3des;
     DCP_md5_1: TDCP_md5;
     DCP_sha1_1: TDCP_sha1;
@@ -121,7 +122,6 @@ type
     function getCSVGroessenId(anlagennummer:string; hoehe:integer;breite:integer):integer;
     function getCSVVersichId(anlagennummer:string):integer;
 
-
     procedure VLE_devicesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     //procedure VLE_devicesClick(Sender: TObject);
@@ -158,6 +158,7 @@ var
   CSVArray_konfig_uncrypt: T2DStringArray;
   CSVArray_SC: T2DStringArray;
   CSVArray_konfig1: T2DStringArray;
+  current_branch: string;
 
 
 implementation
@@ -192,6 +193,28 @@ begin
 
   FormTools.Memo1.Lines.EndUpdate;
 end;
+
+
+// Bereinigen von Dateinamen
+function SanitizeFileName(const FileName: string): string;
+const
+  InvalidChars: set of Char = ['\', '/', ':', '*', '?', '"', '<', '>', '|'];
+var
+  i: Integer;
+  CleanName: string;
+begin
+  CleanName := '';
+  for i := 1 to Length(FileName) do
+  begin
+    if not (FileName[i] in InvalidChars) then
+      CleanName := CleanName + FileName[i];
+    // Optional: Statt Entfernen kannst du auch ersetzen, z.B. durch '_'
+    // else
+    //   CleanName := CleanName + '_';
+  end;
+  Result := CleanName;
+end;
+
 
 // Einlesen der CSV und übergeben incl. der Kopfzeile
 function Tform_tools.ReadCSVFile(const FileName: string): T2DStringArray;
@@ -341,8 +364,6 @@ begin
   end;
   result := csvId;
 end;
-
-
 
 
 procedure Tform_tools.b_genereate_scriptClick(Sender: TObject);
@@ -498,9 +519,8 @@ end;
 procedure Tform_tools.b_save_exportClick(Sender: TObject);
 var fileName, path : String;
 begin
-  fileName := 'data_'+e_konfig1License.Text+'_A'+e_anlagennummer.Text+'.sql';
+  fileName := SanitizeFileName('data_'+ current_branch +'_A'+e_anlagennummer.Text+'.sql');
   path := extractFilePath(Application.ExeName)+'exporte\';
-
   if not DirectoryExists(path) then
   begin
     if CreateDir(path) then
@@ -512,7 +532,18 @@ begin
 
   end;
 
-  SynEdit_export.Lines.SaveToFile(path+fileName);
+  try
+    SynEdit_export.Lines.SaveToFile(path+fileName);
+  except
+    on E: Exception do
+    begin
+      ShowMessage('Fehler beim Speichern der Datei: '+ fileName +' Details: '+ E.Message);
+      mainform.log_common('Fehler beim Speichern der Datei: '+ fileName +' Details: '+ E.Message);
+      exit;
+    end;
+  end;
+
+
 
   ShowMessage('Datei Exportiert nach '+path+fileName);
   MainForm.log_common('Datei Exportiert nach '+path+fileName);
@@ -537,7 +568,7 @@ end;
 
 procedure Tform_tools.sg_groessenClick(Sender: TObject);
 begin
-  showMessage(MainForm.get_boxDepth(sg_groessen.Cells[4,sg_groessen.Row]));
+  //showMessage(MainForm.get_boxDepth(sg_groessen.Cells[4,sg_groessen.Row]));
 end;
 
 procedure Tform_tools.sg_sctableResize(Sender: TObject);
@@ -618,7 +649,7 @@ begin
   // globale variablen initialisieren
   MainForm.qs_recalc := 0;
   LastGroessenId := 0;
-
+  current_branch := '';
 end;
 
 procedure Tform_tools.FormDestroy(Sender: TObject);
@@ -791,6 +822,7 @@ procedure Tform_tools.VLE_devicesMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   e_anlagennummer.Text:= VLE_devices.Keys[VLE_devices.Row];
+  current_branch := VLE_devices.Values[VLE_devices.Keys[VLE_devices.Row]];
   recalc_qs;
   sqlquery_groessenzuordnung;
   e_versichId.Text:= intToStr(getCSVVersichId(VLE_devices.Keys[VLE_devices.Row]));

@@ -25,7 +25,9 @@ backup/
 test/
 test_cenadco_export/
 exporte/
+lib/i386-win32/
 zeoslib/zeosdbo/
+db_zum_rücksetzen/
 *.or
 
 # IDE-spezifisch (optional)
