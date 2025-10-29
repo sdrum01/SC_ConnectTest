@@ -2,10 +2,12 @@ object MainForm: TMainForm
   Left = 273
   Height = 800
   Top = 156
-  Width = 1220
+  Width = 1190
   Caption = 'SCConnect'
   ClientHeight = 800
-  ClientWidth = 1220
+  ClientWidth = 1190
+  Constraints.MinHeight = 800
+  Constraints.MinWidth = 1190
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
     0000400000000100200000000000001000006400000064000000000000000000
@@ -151,8 +153,8 @@ object MainForm: TMainForm
   LCLVersion = '2.0.12.0'
   object DBGrid1: TDBGrid
     Left = 160
-    Height = 700
-    Top = 72
+    Height = 676
+    Top = 96
     Width = 384
     Anchors = [akTop, akLeft, akBottom]
     Color = clWindow
@@ -166,28 +168,19 @@ object MainForm: TMainForm
     TabOrder = 0
     OnMouseDown = DBGrid1MouseDown
   end
-  object e_SQLQuery: TEdit
-    Left = 72
-    Height = 23
-    Top = 2
-    Width = 456
-    Color = clInfoBk
-    OnKeyDown = e_SQLQueryKeyDown
-    TabOrder = 1
-  end
   object B_SQLExec: TButton
-    Left = 528
+    Left = 840
     Height = 25
-    Top = 0
+    Top = 5
     Width = 75
     Caption = 'Ausführen'
     OnClick = B_SQLExecClick
-    TabOrder = 2
+    TabOrder = 1
   end
   object ListBox_tables1: TListBox
     Left = 8
-    Height = 660
-    Top = 96
+    Height = 636
+    Top = 120
     Width = 150
     Anchors = [akTop, akLeft, akBottom]
     Font.Height = -9
@@ -195,20 +188,20 @@ object MainForm: TMainForm
     OnClick = ListBox_tables1Click
     ParentShowHint = False
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
   end
   object Label_qs: TLabel
     Left = 8
     Height = 15
-    Top = 32
+    Top = 56
     Width = 15
     Caption = 'QS'
     ParentColor = False
   end
   object DBGrid2: TDBGrid
-    Left = 847
-    Height = 700
-    Top = 72
+    Left = 822
+    Height = 676
+    Top = 96
     Width = 320
     Anchors = [akTop, akBottom]
     Color = clWindow
@@ -216,32 +209,32 @@ object MainForm: TMainForm
     DataSource = DataSource2
     Flat = True
     Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColumnMove, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgAutoSizeColumns]
-    TabOrder = 4
+    TabOrder = 3
     OnMouseDown = DBGrid2MouseDown
   end
   object TB_2DB: TToggleBox
-    Left = 1165
+    Left = 1135
     Height = 25
-    Top = 2
+    Top = 5
     Width = 51
     Anchors = [akTop, akRight]
     Caption = '2DB'
     OnChange = TB_2DBChange
-    TabOrder = 5
+    TabOrder = 4
   end
   object b_setHostName: TButton
     Left = 840
-    Height = 25
-    Top = 1
-    Width = 136
+    Height = 26
+    Top = 32
+    Width = 80
     Caption = 'setHostname'
     OnClick = b_setHostNameClick
-    TabOrder = 6
+    TabOrder = 5
   end
   object Label2: TLabel
     Left = 192
     Height = 13
-    Top = 58
+    Top = 82
     Width = 33
     Caption = 'Label2'
     Font.CharSet = ANSI_CHARSET
@@ -256,7 +249,7 @@ object MainForm: TMainForm
   object Label3: TLabel
     Left = 584
     Height = 13
-    Top = 58
+    Top = 82
     Width = 33
     Caption = 'Label3'
     Font.CharSet = ANSI_CHARSET
@@ -271,11 +264,11 @@ object MainForm: TMainForm
   object b_chooseDst: TButton
     Left = 552
     Height = 15
-    Top = 58
+    Top = 82
     Width = 27
     Caption = '...'
     OnClick = b_chooseDstClick
-    TabOrder = 7
+    TabOrder = 6
   end
   object DBNavigator1: TDBNavigator
     Left = 160
@@ -294,34 +287,34 @@ object MainForm: TMainForm
     ClientWidth = 368
     DataSource = DataSource1
     Options = []
-    TabOrder = 8
+    TabOrder = 7
   end
   object b_refresh: TButton
     AnchorSideRight.Side = asrBottom
-    Left = 1109
+    Left = 1074
     Height = 25
-    Top = 2
+    Top = 5
     Width = 53
     Anchors = [akTop, akRight]
     Caption = 'Refresh'
     OnClick = b_refreshClick
-    TabOrder = 9
+    TabOrder = 8
   end
   object Edit_filter: TEdit
     Left = 8
     Height = 23
-    Top = 72
+    Top = 96
     Width = 150
     OnChange = Edit_filterChange
     OnClick = Edit_filterClick
-    TabOrder = 10
+    TabOrder = 9
   end
   object Edit_qs: TEdit
     Left = 24
     Height = 23
-    Top = 32
+    Top = 56
     Width = 80
-    TabOrder = 11
+    TabOrder = 10
   end
   object l_genid: TLabel
     Left = 8
@@ -334,7 +327,7 @@ object MainForm: TMainForm
   object l_filter1: TLabel
     Left = 8
     Height = 15
-    Top = 58
+    Top = 82
     Width = 26
     Caption = 'Filter'
     ParentColor = False
@@ -342,36 +335,27 @@ object MainForm: TMainForm
   object b_chooseSrc: TButton
     Left = 160
     Height = 15
-    Top = 58
+    Top = 82
     Width = 27
     Caption = '...'
     OnClick = b_chooseSrcClick
-    TabOrder = 12
+    TabOrder = 11
   end
   object b_tools: TButton
     Left = 984
     Height = 25
-    Top = 2
+    Top = 5
     Width = 88
     Caption = 'SQL-Tools'
     OnClick = b_toolsClick
     OnMouseDown = b_toolsMouseDown
-    TabOrder = 13
+    TabOrder = 12
     Visible = False
   end
-  object B_where: TButton
-    Left = 8
-    Height = 25
-    Top = 0
-    Width = 56
-    Caption = 'WHERE'
-    OnClick = B_whereClick
-    TabOrder = 14
-  end
   object rg_scVersion: TRadioGroup
-    Left = 184
+    Left = 272
     Height = 31
-    Top = 27
+    Top = 51
     Width = 216
     AutoFill = True
     Caption = 'Safecontrol Version'
@@ -391,25 +375,25 @@ object MainForm: TMainForm
       'Cenadco'
     )
     OnClick = rg_scVersionClick
-    TabOrder = 15
+    TabOrder = 13
   end
   object b_exportTable: TButton
     Left = 104
     Height = 25
-    Top = 32
+    Top = 56
     Width = 75
     Caption = 'Export Table'
     OnClick = b_exportTableClick
-    TabOrder = 16
+    TabOrder = 14
   end
   object b_resetSC11User: TButton
-    Left = 840
+    Left = 920
     Height = 26
-    Top = 30
-    Width = 136
+    Top = 32
+    Width = 152
     Caption = 'Reset Bedienercode'
     OnClick = b_resetSC11UserClick
-    TabOrder = 17
+    TabOrder = 15
   end
   object DBNavigator2: TDBNavigator
     Left = 870
@@ -428,33 +412,33 @@ object MainForm: TMainForm
     ClientWidth = 330
     DataSource = DataSource2
     Options = []
-    TabOrder = 18
+    TabOrder = 16
   end
   object Edit_filter2: TEdit
     Left = 664
     Height = 23
-    Top = 72
+    Top = 96
     Width = 150
     OnChange = Edit_filter2Change
     OnClick = Edit_filter2Click
-    TabOrder = 19
+    TabOrder = 17
   end
   object ListBox_tables2: TListBox
     Left = 664
-    Height = 660
-    Top = 96
+    Height = 636
+    Top = 120
     Width = 150
     Anchors = [akTop, akLeft, akBottom]
     Font.Height = -9
     ItemHeight = 0
     OnClick = ListBox_tables2Click
     ParentFont = False
-    TabOrder = 20
+    TabOrder = 18
   end
   object l_filter2: TLabel
     Left = 664
     Height = 15
-    Top = 58
+    Top = 82
     Width = 26
     Caption = 'Filter'
     ParentColor = False
@@ -467,7 +451,7 @@ object MainForm: TMainForm
     Width = 126
     Anchors = [akLeft, akBottom]
     OnChange = e_pw1Change
-    TabOrder = 21
+    TabOrder = 19
     Text = 'e_pw1'
   end
   object e_pw2: TEdit
@@ -477,7 +461,7 @@ object MainForm: TMainForm
     Width = 128
     Anchors = [akLeft, akBottom]
     OnChange = e_pw2Change
-    TabOrder = 22
+    TabOrder = 20
     Text = 'e_pw2'
     Visible = False
   end
@@ -492,7 +476,7 @@ object MainForm: TMainForm
     Width = 32
     Caption = 'DPW'
     OnClick = b_defaultpw1Click
-    TabOrder = 23
+    TabOrder = 21
   end
   object b_defaultpw2: TButton
     AnchorSideLeft.Control = e_pw2
@@ -505,17 +489,14 @@ object MainForm: TMainForm
     Width = 34
     Caption = 'DPW'
     OnClick = b_defaultpw2Click
-    TabOrder = 24
+    TabOrder = 22
   end
-  object b_fachvw: TButton
-    Left = 984
-    Height = 25
-    Top = 32
-    Width = 88
-    Caption = 'FachVW.txt'
-    OnClick = b_fachvwClick
-    TabOrder = 25
-    Visible = False
+  object m_SQLQuery: TMemo
+    Left = 8
+    Height = 46
+    Top = 5
+    Width = 824
+    TabOrder = 23
   end
   object ZConnection1: TZConnection
     ControlsCodePage = cCP_UTF8
@@ -564,7 +545,7 @@ object MainForm: TMainForm
   end
   object OpenDialog1: TOpenDialog
     Filter = 'Firebird-Files|*.fdb|Interbase-Files|*.gdb'
-    Left = 1104
-    Top = 32
+    Left = 1144
+    Top = 72
   end
 end

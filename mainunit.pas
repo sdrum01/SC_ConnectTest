@@ -21,12 +21,10 @@ type
   { TMainForm }
 
   TMainForm = class(TForm)
-    b_fachvw: TButton;
     b_defaultpw1: TButton;
     b_defaultpw2: TButton;
     b_resetSC11User: TButton;
     b_exportTable: TButton;
-    B_where: TButton;
     Button3: TButton;
     b_chooseSrc: TButton;
     b_refresh: TButton;
@@ -45,7 +43,6 @@ type
     Edit_qs: TEdit;
     Edit_filter: TEdit;
     e_pw2: TEdit;
-    e_SQLQuery: TEdit;
     l_filter1: TLabel;
     l_filter2: TLabel;
     ListBox_tables2: TListBox;
@@ -54,6 +51,7 @@ type
     Label2: TLabel;
     Label3: TLabel;
     ListBox_tables1: TListBox;
+    m_SQLQuery: TMemo;
     OpenDialog1: TOpenDialog;
     rg_scVersion: TRadioGroup;
     TB_2DB: TToggleBox;
@@ -68,7 +66,7 @@ type
     procedure b_resetSC11UserClick(Sender: TObject);
     procedure b_toolsMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure B_whereClick(Sender: TObject);
+
 
     procedure b_chooseSrcClick(Sender: TObject);
     procedure b_refreshClick(Sender: TObject);
@@ -88,8 +86,8 @@ type
     procedure e_pw1Change(Sender: TObject);
     procedure e_pw2Change(Sender: TObject);
 
-    procedure e_SQLQueryKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    //procedure e_SQLQueryKeyDown(Sender: TObject; var Key: Word;
+    //  Shift: TShiftState);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
 
     procedure FormDestroy(Sender: TObject);
@@ -348,7 +346,8 @@ end;
 
 procedure TMainForm.B_SQLExecClick(Sender: TObject);
 begin
-  SqlExecute(e_SQLQuery.Text);
+  //SqlExecute(e_SQLQuery.Text);
+  SqlExecute(m_SQLQuery.Text);
 end;
 
 procedure TMainForm.setHostName;
@@ -716,12 +715,6 @@ begin
   end;
 
 
-
-
-
-
-
-
   /// Nochmal die Fachtabelle zum Updaten der Blocknummern aller Fächer
   sql := 'SELECT FACHNUMMER, LAGE, BLOCK from FACH where fachnummer < ' + FormTools.e_fromBox.Text + ' OR fachnummer > '+ FormTools.e_toBox.Text +' AND ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by fachnummer';
   ZQuery1.SQL.Text:= sql;
@@ -924,7 +917,6 @@ begin
   /////////////////////////////////////////////////////
   ///// FACH-Tabelle ///////////
 
-
   sql := 'SELECT ANLAGENNUMMER, GESCHAEFTSTELLE,  FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE,FACHART,SPERRE,RESERVIERUNG,ATTRAPPE,BELEGT,SELBSTANMIETUNG,UEBERWACHUNG,RUNDUM,POSTSPERRE,VERSICHID,ABRECHNUNGSART,WAEHRUNG,BERECHNUNGSZEIT,ANZAHLOEFF,T1ZEIT,T2ZEIT,T3ZEIT,LAGE,BLOCK,PREISGRUPPEINDEX from FACH where fachnummer >= ' + FormTools.e_fromBox.Text + ' AND fachnummer <= '+ FormTools.e_toBox.Text +' AND  ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by ID';
   ZQuery1.SQL.Text:= sql;
   //log_common(sql);
@@ -941,41 +933,6 @@ begin
       //TableList.Add(ZQuery1.Fields[i].AsString);
       if ZQuery1.Fields.FieldByName('ANLAGENNUMMER').AsString = FormTools.e_anlagennummeralt.Text then
       begin
-        // Export aus Cenadco DB:
-        // INSERT INTO CEN_SDL_BOX
-        // (ID, ANLAGENNUMMER, FACHNUMMER, NICHTUEBERWACHTSEIT, UEBERWACHT, CEN_SDL_BOXSIZES_ID, CEN_SC_ID, BOXGROUP, MASTERSLAVE, HOSTNO, HOSTSIZENAME, DUMMY, RACKNO, STATUS, COMPANYNO, ORDERINBLOCK, RENTALSTATE)
-        // VALUES(144, 1, 144, NULL, 1, 4, NULL, NULL, 0, NULL, NULL, 0, 8, NULL, 1, 18, 0);
-
-        {
-        s := 'UPDATE OR INSERT INTO FACH (ANLAGENNUMMER, GESCHAEFTSTELLE, FACHNUMMER, GROESSENID, ANZEIGHOEHE, ANZEIGBREITE, FACHART, SPERRE, RESERVIERUNG, ATTRAPPE, BELEGT, SELBSTANMIETUNG, UEBERWACHUNG, RUNDUM, POSTSPERRE, VERSICHID, ABRECHNUNGSART, WAEHRUNG, BERECHNUNGSZEIT, ANZAHLOEFF, T1ZEIT, T2ZEIT, T3ZEIT, LAGE, BLOCK, PREISGRUPPEINDEX) VALUES ';
-        s +='('+new_anlagennummer+', ';                          //ANLAGENNUMMER
-        s += ZQuery1.Fields.FieldByName('GESCHAEFTSTELLE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('FACHNUMMER').AsString+', ';
-        s += IntToStr(Abs(StrToIntDef(FormTools.sg_groessen.Cells[1,ZQuery1.Fields.FieldByName('GROESSENID').AsInteger],0))) +', ';
-        s += ZQuery1.Fields.FieldByName('ANZEIGHOEHE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ANZEIGBREITE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('FACHART').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('SPERRE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('RESERVIERUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BELEGT').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('SELBSTANMIETUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('UEBERWACHUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('RUNDUM').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('POSTSPERRE').AsString+', ';
-        s += FormTools.e_versichId.Text+', ';
-        if ZQuery1.Fields.FieldByName('ABRECHNUNGSART').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('ABRECHNUNGSART').AsString+', ';
-        if ZQuery1.Fields.FieldByName('WAEHRUNG').IsNull then s += 'NULL, ' else s += ZQuery1.Fields.FieldByName('WAEHRUNG').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BERECHNUNGSZEIT').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('ANZAHLOEFF').AsString+', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T1ZEIT').AsDateTime)+ ''', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T2ZEIT').AsDateTime)+ ''', ';
-        s += '''' + FormatDateTime('yyyy-mm-dd hh:nn:ss', ZQuery1.Fields.FieldByName('T3ZEIT').AsDateTime)+ ''', ';
-        s += ZQuery1.Fields.FieldByName('LAGE').AsString+', ';
-        s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';
-        if ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').IsNull then s += 'NULL' else s += ZQuery1.Fields.FieldByName('PREISGRUPPEINDEX').AsString;
-        s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
-        }
 
         // Export aus Cenadco DB:
         {
@@ -1035,7 +992,7 @@ begin
         s += IntToStr(Abs(StrToIntDef(FormTools.sg_groessen.Cells[1,ZQuery1.Fields.FieldByName('GROESSENID').AsInteger],0))) +', '; // CEN_SDL_BOXSIZES_ID
         s += '0, ';                                                         // MASTERSLAVE
         s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';          // DUMMY oder Attrappe
-        s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';             // RACKNO
+        s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';             // Block or RACKNO
         s += '1, ';                                                         // COMPANYNO
         s += orderInBlock;                                                  // orderInBlock
         // s += orderInBlock+', ';                                          // orderInBlock
@@ -1056,6 +1013,36 @@ begin
       //
     end;
   end;
+
+  /// Nochmal die Fachtabelle zum Updaten der Blocknummern aller Fächer
+  //sql := 'SELECT FACHNUMMER, LAGE, BLOCK from FACH where fachnummer < ' + FormTools.e_fromBox.Text + ' OR fachnummer > '+ FormTools.e_toBox.Text +' AND ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by fachnummer';
+  sql := 'SELECT FACHNUMMER, LAGE, BLOCK from FACH where ANLAGENNUMMER = ' + FormTools.e_anlagennummeralt.Text +' order by fachnummer';
+
+  ZQuery1.SQL.Text:= sql;
+  try
+    FormTools.SynEdit_export.Lines.BeginUpdate;
+    ZQuery1.Open;
+
+    while not ZQuery1.EOF do
+    begin
+      s := 'UPDATE CEN_SDL_BOX SET ';
+      s += 'RACKNO = '+ZQuery1.Fields.FieldByName('BLOCK').AsString;
+      s += ' WHERE ANLAGENNUMMER = '+new_anlagennummer;
+      s += ' AND FACHNUMMER = '+ZQuery1.Fields.FieldByName('FACHNUMMER').AsString;
+      s += ';';
+      FormTools.SynEdit_export.Lines.Add(s);
+      ZQuery1.Next;
+    end;
+
+    FormTools.SynEdit_export.Lines.EndUpdate;
+  except
+    on E: Exception do
+    begin
+      log_common(E.Message);
+    end;
+  end;
+
+
 
   ////////////////////// SC-Tabelle ///////////////////
   log_common('SC-Tabelle:'+ IntToStr(FormTools.sg_sctable.RowCount)+' Einträge');
@@ -1190,7 +1177,7 @@ begin
   iniSettings.dbPw2:=e_pw2.Text;
 end;
 
-
+{
 procedure TMainForm.e_SQLQueryKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -1199,6 +1186,7 @@ begin
      SqlExecute(e_SQLQuery.Text);
   end;
 end;
+}
 
 procedure TMainForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
@@ -1288,10 +1276,7 @@ begin
 end;
 
 
-procedure TMainForm.B_whereClick(Sender: TObject);
-begin
-  e_SQLQuery.Text:= e_SQLQuery.Text+' WHERE ANLAGENNUMMER = ';
-end;
+
 
 procedure TMainForm.exportFachVW(AFileName: string);
 var
@@ -1472,7 +1457,8 @@ begin
     DBGrid1.DataSource := Datasource1;
     try
       ZQuery1.SQL.Text:= s;
-      e_SQLQuery.Text := s;
+      //e_SQLQuery.Text := s;
+      m_SQLQuery.Text:= s;
       ZQuery1.Open;
     except
       on E: Exception do
@@ -1488,7 +1474,8 @@ begin
     DBGrid2.DataSource := Datasource2;
     try
       ZQuery2.SQL.Text:= s;
-      e_SQLQuery.Text := s;
+      //e_SQLQuery.Text := s;
+      m_SQLQuery.Text:= s;
       ZQuery2.Open;
     except
       on E: Exception do

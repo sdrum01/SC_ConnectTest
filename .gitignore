@@ -33,3 +33,5 @@ db_zum_rücksetzen/
 # IDE-spezifisch (optional)
 *.lps    # Lazarus Session-Dateien
 # *.lpi    # Projekt-Informationen (nur ignorieren, wenn nicht geteilt)
+
+firebird.msg
