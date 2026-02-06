@@ -1,5 +1,5 @@
 object form_tools: Tform_tools
-  Left = 267
+  Left = 269
   Height = 640
   Top = 115
   Width = 1402

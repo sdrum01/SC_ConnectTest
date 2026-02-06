@@ -353,10 +353,11 @@ object MainForm: TMainForm
     Visible = False
   end
   object rg_scVersion: TRadioGroup
-    Left = 272
-    Height = 31
-    Top = 51
+    Left = 968
+    Height = 29
+    Top = 56
     Width = 216
+    Anchors = [akTop, akRight]
     AutoFill = True
     Caption = 'Safecontrol Version'
     ChildSizing.LeftRightSpacing = 6
@@ -366,9 +367,10 @@ object MainForm: TMainForm
     ChildSizing.ShrinkVertical = crsScaleChilds
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 2
-    ClientHeight = 11
+    ClientHeight = 9
     ClientWidth = 212
     Columns = 2
+    Enabled = False
     ItemIndex = 0
     Items.Strings = (
       'SC11'
@@ -380,7 +382,7 @@ object MainForm: TMainForm
   object b_exportTable: TButton
     Left = 104
     Height = 25
-    Top = 56
+    Top = 55
     Width = 75
     Caption = 'Export Table'
     OnClick = b_exportTableClick
@@ -545,7 +547,11 @@ object MainForm: TMainForm
   end
   object OpenDialog1: TOpenDialog
     Filter = 'Firebird-Files|*.fdb|Interbase-Files|*.gdb'
-    Left = 1144
-    Top = 72
+    Left = 1072
+    Top = 104
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 944
+    Top = 112
   end
 end

@@ -54,6 +54,7 @@ type
     m_SQLQuery: TMemo;
     OpenDialog1: TOpenDialog;
     rg_scVersion: TRadioGroup;
+    SaveDialog1: TSaveDialog;
     TB_2DB: TToggleBox;
     ZConnection1: TZConnection;
     ZConnection2: TZConnection;
@@ -212,7 +213,7 @@ begin
   selected_dbId := 1;
   try
     iniSettings := ReadSettings;
-    rg_scVersion.ItemIndex:=iniSettings.sc_version;
+    //rg_scVersion.ItemIndex:=iniSettings.sc_version;
     if (fileExists(iniSettings.dbFile1)) then
     begin
       //ZConnection1.Database:=iniSettings.dbFile1;
@@ -953,7 +954,7 @@ begin
         - STATUS,
         1 COMPANYNO,
         + ORDERINBLOCK, (Zeilenhöhe, evtl enumerator??)
-        0 RENTALSTATE
+        1 RENTALSTATE
         )
         VALUES(
 
@@ -983,8 +984,7 @@ begin
         orderInBlock := intToStr(i);
         block_bak := ZQuery1.Fields.FieldByName('BLOCK').AsString;
 
-        //s := 'UPDATE OR INSERT INTO CEN_SDL_BOX (ANLAGENNUMMER, FACHNUMMER, UEBERWACHT, CEN_SDL_BOXSIZES_ID, MASTERSLAVE, DUMMY, RACKNO, COMPANYNO, ORDERINBLOCK, RENTALSTATE) VALUES ';
-        s := 'UPDATE OR INSERT INTO CEN_SDL_BOX (ANLAGENNUMMER, FACHNUMMER, UEBERWACHT, CEN_SDL_BOXSIZES_ID, MASTERSLAVE, DUMMY, RACKNO, COMPANYNO, ORDERINBLOCK) VALUES ';
+        s := 'UPDATE OR INSERT INTO CEN_SDL_BOX (ANLAGENNUMMER, FACHNUMMER, UEBERWACHT, CEN_SDL_BOXSIZES_ID, MASTERSLAVE, DUMMY, RACKNO, COMPANYNO, ORDERINBLOCK, RENTALSTATE) VALUES ';
 
         s +='('+new_anlagennummer+', ';                                     // ANLAGENNUMMER
         s += ZQuery1.Fields.FieldByName('FACHNUMMER').AsString+', ';        // Fachnummer
@@ -994,9 +994,8 @@ begin
         s += ZQuery1.Fields.FieldByName('ATTRAPPE').AsString+', ';          // DUMMY oder Attrappe
         s += ZQuery1.Fields.FieldByName('BLOCK').AsString+', ';             // Block or RACKNO
         s += '1, ';                                                         // COMPANYNO
-        s += orderInBlock;                                                  // orderInBlock
-        // s += orderInBlock+', ';                                          // orderInBlock
-        // s += '0';                                                        // RENTALSTATE
+        s += orderInBlock+', ';                                             // orderInBlock
+        s += '0';                                                           // RENTALSTATE immer entmietet
         s += ') MATCHING (ANLAGENNUMMER, FACHNUMMER);';
 
         FormTools.SynEdit_export.Lines.Add(s);
@@ -1389,7 +1388,12 @@ end;
 procedure TMainForm.b_exportTableClick(Sender: TObject);
 begin
   //.SaveToFile(ExtractFilePath(Application.ExeName)+'export.csv');
-  ExportDBGridToCSV(DBGrid1, 'export_'+actualTable+'.csv', ';');
+  // SaveDialog1.FileName:= 'export_'+actualTable+'.csv';
+  //if (SaveDialog1.Execute)then
+  //begin
+    ExportDBGridToCSV(DBGrid1, 'export_'+actualTable+'.csv', ';');
+  //end;
+
 end;
 
 procedure TMainForm.b_fachvwClick(Sender: TObject);
@@ -1443,8 +1447,8 @@ end;
 
 procedure TMainForm.rg_scVersionClick(Sender: TObject);
 begin
-  iniSettings.sc_version:= rg_scVersion.ItemIndex;
-  WriteSettings(iniSettings);
+  //iniSettings.sc_version:= rg_scVersion.ItemIndex;
+  //WriteSettings(iniSettings);
 end;
 
 procedure TMainForm.SqlExecShow(s:string);
