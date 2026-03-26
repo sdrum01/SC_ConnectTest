@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, Windows, SysUtils, DB, Forms, Controls, Graphics, Dialogs, StdCtrls, DBCtrls,
-  DBGrids, ExtCtrls,  ZConnection, ZDataset, tools, DateUtils;
+  DBGrids, ExtCtrls,  ZConnection, ZDataset, ZSqlMonitor, tools, DateUtils;
 
 {
 type
@@ -60,6 +60,7 @@ type
     ZConnection2: TZConnection;
     ZQuery1: TZQuery;
     ZQuery2: TZQuery;
+    ZSQLMonitor1: TZSQLMonitor;
     procedure b_defaultpw1Click(Sender: TObject);
     procedure b_defaultpw2Click(Sender: TObject);
     procedure b_exportTableClick(Sender: TObject);
@@ -124,6 +125,7 @@ type
     function get_boxDepth(s:string):string;
     //Procedure WriteLog(s, LogFile : String);
     procedure exportFachVW(AFileName: string);
+    procedure ZSQLMonitor1LogTrace(Sender: TObject; Event: TZLoggingEvent);
 
   private
 
@@ -1325,6 +1327,12 @@ begin
   end;
   CloseFile(f);
   ShowMessage('Tabelle Exportiert nach '+AFileName);
+end;
+
+procedure TMainForm.ZSQLMonitor1LogTrace(Sender: TObject; Event: TZLoggingEvent
+  );
+begin
+  log_common('SQL: '+ Event.Message);
 end;
 
 

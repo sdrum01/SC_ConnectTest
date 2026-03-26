@@ -554,4 +554,11 @@ object MainForm: TMainForm
     Left = 944
     Top = 112
   end
+  object ZSQLMonitor1: TZSQLMonitor
+    Active = True
+    MaxTraceCount = 100
+    OnLogTrace = ZSQLMonitor1LogTrace
+    Left = 248
+    Top = 224
+  end
 end
